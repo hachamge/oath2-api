@@ -6,6 +6,7 @@ from googleapi.gmail_SDK_suit import SDK_Suit #custom package
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 load_dotenv()
 
