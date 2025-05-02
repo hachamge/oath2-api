@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fred Meyer - Real Store Search</title>
+    <style>
+        :root {
+            --primary: #00562f;
+            --secondary: #ffc72c;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .logo span {
+            color: var(--secondary);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .search-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .search-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #004525;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--dark);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e6b400;
+        }
+        
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+        }
+        
+        .btn-loading::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            border: 3px solid transparent;
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .results-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .results-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+        
+        .results-count {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .product-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-image {
+            height: 180px;
+            background-color: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .product-info {
+            padding: 1rem;
+        }
+        
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .product-price {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-store {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+            grid-column: 1 / -1;
+        }
+        
+        .store-selector {
+            display: none;
+            margin-top: 1rem;
+        }
+        
+        .store-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
+        
+        .store-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        
+        .store-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .store-item.active {
+            background-color: #e8f4ea;
+        }
+
+        /* Filter panel styles */
+        .filter-panel {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #eee;
+            max-width: 900px;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+        }
+        
+        .filter-title {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .filter-icon {
+            font-size: 1.2rem;
+        }
+        
+        .filter-content {
+            display: none;
+            padding-top: 1rem;
+        }
+        
+        .filter-content.show {
+            display: block;
+        }
+        
+        .filter-group {
+            margin-bottom: 1rem;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .price-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        /* Pagination styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            gap: 0.5rem;
+        }
+        
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .page-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 768px) {
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="#" class="logo">Fred<span>Meyer</span></a>
+        <div>
+            <button class="btn btn-secondary">Sign In</button>
+        </div>
+    </header>
+    
+    <div class="container">
+        <section class="search-section">
+            <h1 class="search-title">Find Products at Fred Meyer</h1>
+            <form id="searchForm" class="search-form">
+                <div class="form-group">
+                    <label for="searchTerm">What are you looking for?</label>
+                    <input type="text" id="searchTerm" class="form-control" placeholder="e.g. Milk, Eggs, Bread">
+                </div>
+                <div class="form-group">
+                    <label for="zipCode">ZIP Code</label>
+                    <input type="text" id="zipCode" class="form-control" placeholder="Enter ZIP code" value="97202">
+                    <button type="button" id="findStoresBtn" class="btn btn-secondary" style="margin-top: 0.5rem; width: 100%;">
+                        Find Nearby Stores
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label>Nearby Stores</label>
+                    <div class="store-list" id="storeList">
+                        <div class="no-results">Enter a ZIP code to find stores</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="category">Category (optional)</label>
+                    <select id="category" class="form-control">
+                        <option value="">All Categories</option>
+                        <option value="Bakery">Bakery</option>
+                        <option value="Beverages">Beverages</option>
+                        <option value="Dairy">Dairy</option>
+                        <option value="Frozen Foods">Frozen Foods</option>
+                        <option value="Meat">Meat</option>
+                        <option value="Produce">Produce</option>
+                    </select>
+                </div>
+                <div class="form-group" style="align-self: flex-end;">
+                    <button type="submit" id="searchBtn" class="btn">
+                        Search
+                    </button>
+                </div>
+            </form>
+        </section>
+        
+        <section class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-header">
+                <h2 class="results-title">Search Results</h2>
+                <div class="results-count">Showing <span id="resultsCount">0</span> items</div>
+            </div>
+            
+            <!-- Filter panel -->
+            <div class="filter-panel">
+                <div class="filter-header" id="filterToggle">
+                    <h3 class="filter-title">Filters</h3>
+                    <span class="filter-icon">▼</span>
+                </div>
+                <div class="filter-content" id="filterContent">
+                    <div class="filter-group">
+                        <label>Maximum Price ($)</label>
+                        <input type="number" id="maxPrice" class="price-input" placeholder="Enter max price" value="10" min="0" max="100" step="0.01">
+                    </div>
+                    <div class="filter-group">
+                        <label>Categories</label>
+                        <select id="filterCategory" class="form-control">
+                            <option value="">All Categories</option>
+                            <option value="Dairy">Dairy</option>
+                            <option value="Bakery">Bakery</option>
+                            <option value="Produce">Produce</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>In Stock Only</label>
+                        <input type="checkbox" id="inStockOnly">
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn btn-sm" id="applyFilters">Apply Filters</button>
+                        <button class="btn btn-sm btn-secondary" id="resetFilters">Reset</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="product-grid" id="productGrid">
+                <!-- Results will be inserted here by JavaScript -->
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination" id="pagination">
+                <button class="page-btn" id="prevPage">Previous</button>
+                <div id="pageNumbers"></div>
+                <button class="page-btn" id="nextPage">Next</button>
+            </div>
+        </section>
+    </div>
+<script>
+    // Current state
+    let currentProducts = [];
+    let currentFilters = {
+        maxPrice: 10,
+        category: '',
+        inStockOnly: false
+    };
+    let currentPage = 1;
+    const itemsPerPage = 9;
+
+    // DOM Elements
+    const searchForm = document.getElementById('searchForm');
+    const searchBtn = document.getElementById('searchBtn');
+    const resultsSection = document.getElementById('resultsSection');
+    const productGrid = document.getElementById('productGrid');
+    const resultsCount = document.getElementById('resultsCount');
+    const filterToggle = document.getElementById('filterToggle');
+    const filterContent = document.getElementById('filterContent');
+    const maxPrice = document.getElementById('maxPrice');
+    const filterCategory = document.getElementById('filterCategory');
+    const inStockOnly = document.getElementById('inStockOnly');
+    const applyFilters = document.getElementById('applyFilters');
+    const resetFilters = document.getElementById('resetFilters');
+    const prevPage = document.getElementById('prevPage');
+    const nextPage = document.getElementById('nextPage');
+    const pageNumbers = document.getElementById('pageNumbers');
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set up event listeners
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handleSearch();
+        });
+
+        // Filter panel toggle
+        filterToggle.addEventListener('click', function() {
+            filterContent.classList.toggle('show');
+            const icon = this.querySelector('.filter-icon');
+            icon.textContent = filterContent.classList.contains('show') ? '▲' : '▼';
+        });
+
+        // Max price input
+        maxPrice.addEventListener('change', function() {
+            currentFilters.maxPrice = parseFloat(this.value) || 10;
+        });
+
+        // Category filter
+        filterCategory.addEventListener('change', function() {
+            currentFilters.category = this.value;
+        });
+
+        // In stock filter
+        inStockOnly.addEventListener('change', function() {
+            currentFilters.inStockOnly = this.checked;
+        });
+
+        // Apply filters
+        applyFilters.addEventListener('click', function() {
+            currentPage = 1;
+            applyCurrentFilters();
+        });
+
+        // Reset filters
+        resetFilters.addEventListener('click', function() {
+            maxPrice.value = 10;
+            filterCategory.value = '';
+            inStockOnly.checked = false;
+            currentFilters = {
+                maxPrice: 10,
+                category: '',
+                inStockOnly: false
+            };
+            currentPage = 1;
+            applyCurrentFilters();
+        });
+
+        // Pagination
+        prevPage.addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                applyCurrentFilters();
+            }
+        });
+
+        nextPage.addEventListener('click', function() {
+            const totalPages = Math.ceil(currentProducts.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                applyCurrentFilters();
+            }
+        });
+    });
+
+    // Updated store finder functionality
+    document.getElementById('findStoresBtn').addEventListener('click', function() {
+        const zipCode = document.getElementById('zipCode').value.trim();
+        if (!zipCode) {
+            alert('Please enter a ZIP code');
+            return;
+        }
+
+        this.classList.add('btn-loading');
+        this.disabled = true;
+        this.textContent = 'Finding Stores...';
+
+        fetch('/api/stores', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ zipCode: zipCode })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const storeList = document.getElementById('storeList');
+            storeList.innerHTML = data.stores.map((store, index) => `
+                <div class="store-item ${index === 0 ? 'active' : ''}" data-location-id="${store.location_id}">
+                    <strong>${store.name}</strong><br>
+                    ${store.address}<br>
+                    <small>${store.distance}</small>
+                </div>
+            `).join('');
+
+            // Add click handlers for store selection
+            document.querySelectorAll('.store-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.store-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        })
+        .finally(() => {
+            this.classList.remove('btn-loading');
+            this.disabled = false;
+            this.textContent = 'Find Nearby Stores';
+        });
+    });
+
+    function handleSearch() {
+        const searchTerm = document.getElementById('searchTerm').value.trim();
+        const zipCode = document.getElementById('zipCode').value.trim() || '97202';
+        
+        if (!searchTerm) {
+            alert('Please enter a search term');
+            return;
+        }
+
+        // Show loading state
+        searchBtn.classList.add('btn-loading');
+        searchBtn.disabled = true;
+        searchBtn.textContent = 'Searching...';
+
+        fetch('/api/search', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                searchTerm: searchTerm,
+                zipCode: zipCode
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            
+            // Show results section
+            resultsSection.style.display = 'block';
+            
+            // Reset to first page and update products
+            currentPage = 1;
+            currentProducts = data.products;
+            applyCurrentFilters();
+        })
+        .finally(() => {
+            searchBtn.classList.remove('btn-loading');
+            searchBtn.disabled = false;
+            searchBtn.textContent = 'Search';
+        });
+    }
+
+    function applyCurrentFilters() {
+        // Filter products based on current filters
+        let filteredProducts = currentProducts.filter(product => {
+            return product.price <= currentFilters.maxPrice &&
+                   (currentFilters.category === '' || product.category === currentFilters.category) &&
+                   (!currentFilters.inStockOnly || product.stock > 0);
+        });
+
+        // Update results count
+        resultsCount.textContent = filteredProducts.length;
+
+        // Calculate pagination
+        const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = Math.min(startIndex + itemsPerPage, filteredProducts.length);
+        const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+
+        // Clear previous results
+        productGrid.innerHTML = '';
+
+        if (filteredProducts.length === 0) {
+            productGrid.innerHTML = '<div class="no-results">No products found matching your filters</div>';
+            updatePaginationUI(0);
+            return;
+        }
+
+        // Display filtered products
+        paginatedProducts.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.innerHTML = `
+                <div class="product-image" style="background-image: url('${product.image}')"></div>
+                <div class="product-info">
+                    <h3 class="product-name">${product.name}</h3>
+                    <div class="product-price">$${product.price.toFixed(2)}</div>
+                    <div class="product-meta">
+                        <span>SKU: ${product.sku}</span>
+                        <span>In Stock: ${product.stock}</span>
+                    </div>
+                    <div class="product-store">${product.store}</div>
+                    <div class="product-actions">
+                        <button class="btn btn-sm">Add to Cart</button>
+                        <button class="btn btn-sm btn-secondary">Save</button>
+                    </div>
+                </div>
+            `;
+            productGrid.appendChild(productCard);
+        });
+
+        // Update pagination UI
+        updatePaginationUI(totalPages);
+    }
+
+    function updatePaginationUI(totalPages) {
+        // Clear previous page numbers
+        pageNumbers.innerHTML = '';
+
+        // Update prev/next buttons
+        prevPage.disabled = currentPage === 1;
+        nextPage.disabled = currentPage === totalPages || totalPages === 0;
+
+        // Generate page number buttons
+        for (let i = 1; i <= totalPages; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+            pageBtn.textContent = i;
+            pageBtn.addEventListener('click', () => {
+                currentPage = i;
+                applyCurrentFilters();
+            });
+            pageNumbers.appendChild(pageBtn);
+        }
+    }
+</script>
+    </body>
+</html>

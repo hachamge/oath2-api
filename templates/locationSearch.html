@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<title>Location Search v1</title>
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/locationSearch.css') }}">	
+	</head>
+	<body>
+		<main class="locationSearch-container">
+			{% include 'search.html' %}
+			{% include 'map.html'%}
+		</main>
+		<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}" async defer></script>
+		<script>
+			function TypeOutResponse(html, input) {
+				let index = 0;
+				let typingText = input;
+				let parser = '';
+				html.textContent = '';
+				const typingInterval = setInterval(function() {
+					if (index < typingText.length) {
+						html.textContent += typingText[index];
+						index++;
+					} else {
+						clearInterval(typingInterval);
+					}
+				}, 30)
+			}
+
+			let latitude = 45.56734;
+			let longitude = -122.85974;
+			let locations = {{ locations | tojson }}
+			const popup = document.querySelector(".container");
+
+			let mapOptions = {
+				center: {lat: locations[0].lat, lng: locations[0].lng},
+				zoom: 12,
+			}
+
+			let map = new google.maps.Map(document.getElementById('GoogleMap'), mapOptions);
+
+			locations.forEach(location => {
+				let marker = new google.maps.Marker({
+					position: {lat: location.lat, lng: location.lng},
+					map: map,
+				});
+
+				marker.customInfo = {
+					"lat": location.lat,
+					"lng": location.lng,
+					"name": location.name,
+					"address": location.address,
+					"phone": location.phone_number,
+					"locationId": location.location_id,
+				};
+
+				google.maps.event.addListener(marker, 'click', function() {
+					let details = marker.customInfo;
+					TypeOutResponse(popup.children[0], details.name);
+					popup.children[1].textContent = `${details.lat}  ${details.lng}`;
+					TypeOutResponse(popup.children[2], details.address);
+					TypeOutResponse(popup.children[3], details.phone);
+					TypeOutResponse(popup.children[4], details.locationId);
+				});
+			});
+
+			//form submission
+			document.getElementById("q-zip").addEventListener('change', function() {
+				document.getElementById('searchParameters').submit();
+			});
+		</script>
+	</body>
+</html>

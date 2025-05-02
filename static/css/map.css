@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+.map {
+	order: 1;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: center;
+	position: relative;
+}
+
+.GoogleMap {
+	width: 100%;
+	height: 100%;
+}
+
+.pop-up {
+	width: 100%;
+	height: 130px;
+	background: #ffffff;
+	position: absolute;
+	bottom: 0;
+	border-radius: 50px 50px 0 0;
+}
+
+.container > p {
+	color: gray;
+}
+
+.container p:nth-child(4) {
+	color: blue;
+}
+
+.container p:nth-child(5) {
+	color: black;
+}
+
+.pop-up > img {
+	position: absolute;
+	right: 2%;
+	top: 7%;
+}
+
+#popup-Details > .container {
+	top: 10%;
+	position: relative;
+	left: 5%;
+	font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.popup-search {
+	position: absolute;
+	bottom: 10%;
+	width: 300px;
+	padding: 10px;
+	display: flex;
+	flex-direction: row;
+	height: 100px;
+	background: #ffffff;
+	border-radius: 30px;
+	justify-content: space-around;
+	align-items: center;
+}
+
+#searchZip {
+	display: flex;
+	flex-direction: column;
+}
+
+#searchZip input[type="search"] {
+	padding: 10px;
+	width: 200px;
+	height: 50px;
+	border: none;
+	font-size: 1em;
+	background: #E5E4E2;
+}
+
+#searchZip input[type="number"] {
+	padding: 10px;
+	width: 130px;
+	height: 50px;
+	border: none;
+	font-size: 1em;
+	background: #E5E4E2;
+}

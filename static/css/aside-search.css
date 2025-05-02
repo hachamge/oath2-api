@@ -1,0 +1,8 @@
+.aside-search {
+	order: 2;
+	/*width: 22%;*/
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	background: #ffffff;
+}

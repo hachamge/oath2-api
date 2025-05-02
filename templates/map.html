@@ -1,0 +1,20 @@
+<div class="map">
+	<div id="GoogleMap" class="GoogleMap"></div>
+	<div class="pop-up" id="popup-Details">
+		<img src="{{ url_for('static', filename='images/icons8-close-50.png') }}">
+		<div class="container">
+			<h2>Hydrant 12</h2>
+			<p>34.0562˚N -117.1968˚W</p>
+			<p>117 Imbrie Dr, Hillsboro, OR, 97124</p>
+			<p>(971) 300-1321</p>
+			<p>7077213</p>
+		</div>
+	</div>
+
+		<form class="popup-search" id="searchParameters" action="/v1/endpoint/locations" method="POST">
+			<div id="searchZip">
+				<input type="search" name="zip" id="q-zip" placeholder="97077">
+			</div>
+		</form>
+		<!--<script src="{{ url_for('static', filename='scripts/map.js') }}"></script>-->
+</div>

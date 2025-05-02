@@ -1,0 +1,190 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&family=Ubuntu+Condensed&display=swap');
+
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+body {
+	width: 100%;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+	background: #1C1C1E;
+}
+
+.mainContent {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.searchBarContainer {
+	width: 100%;
+	height: 15%;
+	display: flex;
+	position: relative;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	background: #097969;
+}
+
+.searchBarContainer > p {
+	color: white;
+	font-size: 1.1em;
+	margin-bottom: 5px;
+}
+
+.searchBarContainer b {
+	text-decoration: underline;
+	font-weight: normal;
+}
+
+.searchBarContainer > form {
+	width: 60%;
+	display: flex;
+	justify-content: center;
+}
+
+#cartBtnContainer {
+	width: 50px;
+	height: 50px;
+	position: absolute;
+	right: 5%;
+}
+
+#cartQty {
+	width: 20px;
+	height: 20px;
+	font-weight: bolder;
+	text-align: center;
+	font-size: 10px;
+	background: #ffffff;
+	position: absolute;
+	border-radius: 50%;
+	right: 2%;
+	top: 2%;
+	padding: 3px;
+}
+
+#cartBtnContainer > img {
+	width: 40px;
+	height: 40px;
+	background: none;
+}
+
+.searchBarContainer input[type="search"] {
+	width: 80%;
+	padding: 10px;
+	background: #E5E4E2;
+	font-size: 1.2em;
+	border: none;
+}
+
+.searchResultsContainer {
+	width: 100%;
+	height: 85%;
+	background: #ffffff;
+	overflow: scroll;
+	overflow-x: hidden;
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+.searchResult {
+	width: 300px;
+	height: 300px;
+	display: flex;
+	position: relative;
+	justify-content: center;
+	border: 2px dotted black;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.searchResult > p {
+	font-size: 1.2em;
+	color: gray;
+	word-wrap: break-word;
+}
+
+.searchResult > img {
+	width: 100px;
+	height: auto;
+	margin: 0 auto;
+}
+
+.searchResult > h3 {
+	width: 100px;
+	color: #ffffff;
+	position: absolute;
+	top: 0;
+	right: 0;
+	text-align: center;
+	padding: 7px;
+	background: #097969;
+	font-family: "Noto Sans JP", sans-serif;
+}
+
+#shoppingCartContainer {
+	width: 40%;
+	height: 100%;
+	right: 0;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	background: #E5E4E2;
+}
+
+#shoppingCartContainer > img {
+	position: absolute;
+	right: 5%;
+	top: 2%;
+	width: 50px;
+	height: 50px;
+}
+
+#cartItems {
+	width: 80%;
+	height: 80%;
+	display: flex;
+	overflow: auto;
+	overflow-x: hidden;
+	align-items: center;
+	flex-direction: column;
+	background: #ffffff;
+}
+
+.itemInCart {
+	width: 97%;
+	height: 150px;
+	display: flex;
+	align-items: center;
+	flex-direction: row;
+}
+
+.itemInCart b {
+	text-decoration: underline;
+}
+
+.itemInCart > p {
+	font-size: 1.2em;
+	color: gray;
+	order: 2;
+	word-wrap: break-word;
+}
+
+.itemInCart > img {
+	max-width: 100px;
+	max-height: 100px;
+	order: 1;
+}
