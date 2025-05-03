@@ -1,6 +1,9 @@
 import requests
+# from fastapi import FastAPI
 from .auth import auth
 import json
+
+# app = FastAPI()
 
 class oath():
     def __init__(self):
@@ -8,7 +11,8 @@ class oath():
         self.access_token = access.token()
         self.endpoint = 'https://api.kroger.com/v1/locations'
 
-    def get_loct(self, zipCode: str="97124", limit: int=13):
+    # @app.get("/locations", description="Fetch raw Kroger locations by ZIP code")
+    def get_loct(self, zipCode: str = "97124", limit: int = 13):
         params = {
             'filter.limit': limit,
             'filter.radiusInMiles': 13,
@@ -46,7 +50,7 @@ class oath():
 
         return result
 
-    def products_endpoint(self, locationId:int=None, q:str=None):
+    def products_endpoint(self, locationId:int=None, q:str=None, results:int=44):
         endpoint = 'https://api.kroger.com/v1/products'
         headers = {
             'Accept': 'application/json',
@@ -56,9 +60,9 @@ class oath():
         params = {
             'filter.locationId': locationId,
             'filter.term': q,
-            'filter.limit': 44,
+            'filter.limit': results,
         }
-        print('access_token: ', self.access_token)
+        # print('access_token: ', self.access_token)
         response = requests.get(endpoint, headers=headers, params=params)
 
         if response.status_code == 200:
@@ -66,9 +70,9 @@ class oath():
 
         return response.text
 
-    def structure_pos(self, locationId: int=70100661, search: str="milk"):
+    def structure_pos(self, locationId: int=70100661, search: str="milk", results:int=44):
         result = []
-        response = self.products_endpoint(locationId=locationId, q=search)
+        response = self.products_endpoint(locationId=locationId, q=search, results=results)
 
         for item in response.get('data', []):
             pos = {
@@ -77,15 +81,19 @@ class oath():
                 "brand": item.get("brand"),
                 "price": item.get("items", [])[0].get("price", {}).get("regular"),
                 "size": item.get("items", [])[0].get("size", {}),
+                "screenshots": []  # New field
             }
-            # Extracting the small front image
             images = item.get("images", [])
             for image in images:
                 if image.get("perspective") == "front":
                     for size in image.get("sizes", []):
                         if size.get("size") == "small":
                             pos["smlImage"] = size.get("url")
-                    break
+                    continue  # Skip adding "front" to screenshots
+                for size in image.get("sizes", []):
+                    if "url" in size:
+                        pos["screenshots"].append(size["url"])
+
             result.append(pos)
 
         return result
