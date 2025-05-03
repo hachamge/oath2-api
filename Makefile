@@ -24,4 +24,5 @@ uvicorn:
 stop:
 	-@kill -9 `cat flask.pid` 2>/dev/null || true
 	-@kill -9 `cat uvicorn.pid` 2>/dev/null || true
+	-@lsof -ti :8000 | xargs -r kill -9
 	@rm -f flask.pid uvicorn.pid
