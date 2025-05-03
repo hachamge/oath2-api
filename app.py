@@ -58,7 +58,8 @@ def handle_search():
             "store": stores[0]['name'],
             "sku": product.get("productId", ""),
             "stock": 50,
-            "category": ""
+            "category": "",
+            "screenshots": product.get("screenshots", [])[3:6]
         })
 
     return jsonify({
