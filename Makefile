@@ -8,8 +8,8 @@ all: run
 
 run:
 	@echo "Starting Flask and Uvicorn..."
-	@$(FLASK_CMD) & \
-	$(UVICORN_CMD) & \
+	@$(FLASK_CMD) & echo $$! > flask.pid & \
+	$(UVICORN_CMD) & echo $$! > uvicorn.pid & \
 	sleep 3 && $(UVICORN_DOCS) & \
 	wait
 
@@ -21,3 +21,7 @@ uvicorn:
 	@echo "Running Uvicorn app..."
 	@$(UVICORN_CMD)
 
+stop:
+	-@kill -9 `cat flask.pid` 2>/dev/null || true
+	-@kill -9 `cat uvicorn.pid` 2>/dev/null || true
+	@rm -f flask.pid uvicorn.pid
