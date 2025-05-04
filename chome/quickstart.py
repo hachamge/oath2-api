@@ -98,6 +98,33 @@ class oath():
 
         return result
 
+
+    def get_aisle_info_by_id(self, productId: str, locationId: int = None):
+        """
+        Fetches aisleLocations and basic product info from product details endpoint using productId.
+        If locationId is provided, aisleLocations will be store-specific.
+        """
+        endpoint = f'https://api.kroger.com/v1/products/{productId}'
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': f'Bearer {self.access_token}',
+        }
+
+        params = {}
+        if locationId:
+            params['filter.locationId'] = locationId
+
+        response = requests.get(endpoint, headers=headers, params=params)
+        if response.status_code != 200:
+            return None
+
+        product = response.json().get("data", {})
+        return {
+            "productId": product.get("productId"),
+            "name": product.get("description"),
+            "aisleLocations": product.get("aisleLocations", [])
+        }
+
     def format_phone_number(self, phone_number):
         phone_number = str(phone_number)  # Ensure it's a string
         return f"({phone_number[:3]}) {phone_number[3:6]}-{phone_number[6:]}"
