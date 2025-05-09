@@ -1,4 +1,5 @@
 import os
+import random
 # from pudb import set_trace
 from dotenv import load_dotenv
 from chome.quickstart import oath #custom package
@@ -15,7 +16,7 @@ def index():
     # Get default locations for Google Maps
     oathRequest = oath()
     locations = oathRequest.structure_ts()
-    
+
     params = {
         "GOOGLE_MAPS_API_KEY": os.getenv('GOOGLE_MAPS_API_KEY'),
         "locations": locations,
@@ -57,7 +58,7 @@ def handle_search():
             "image": product.get("smlImage", ""),
             "store": stores[0]['name'],
             "sku": product.get("productId", ""),
-            "stock": 50,
+            "stock": random.randint(1, 100),
             "category": "",
             "screenshots": product.get("screenshots", [])[3:6]
         })
