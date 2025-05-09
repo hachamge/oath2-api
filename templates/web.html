@@ -907,50 +907,92 @@
         }
     }
 
-    function showProductModal(product) {
-        // Create thumbnails HTML if screenshots exist
-        const thumbnailsHTML = product.screenshots && product.screenshots.length > 0 
-            ? product.screenshots.map((img, index) => `
-                <div class="modal-thumbnail ${index === 0 ? 'active' : ''}" 
-                     style="background-image: url('${img}')"
-                     onclick="changeModalImage('${img}', this)"></div>
-              `).join('')
-            : `<div class="modal-thumbnail active" 
-                  style="background-image: url('${product.image}')"
-                  onclick="changeModalImage('${product.image}', this)"></div>`;
+   function showProductModal(product) {
+    // Create thumbnails HTML if screenshots exist
+    const thumbnailsHTML = product.screenshots && product.screenshots.length > 0 
+        ? product.screenshots.map((img, index) => `
+            <div class="modal-thumbnail ${index === 0 ? 'active' : ''}" 
+                 style="background-image: url('${img}')"
+                 onclick="changeModalImage('${img}', this)"></div>
+          `).join('')
+        : `<div class="modal-thumbnail active" 
+              style="background-image: url('${product.image}')"
+              onclick="changeModalImage('${product.image}', this)"></div>`;
 
-        // Create modal content
-        modalContent.innerHTML = `
-            <div class="modal-product-images">
-                <div class="modal-main-image" 
-                     style="background-image: url('${product.screenshots && product.screenshots.length > 0 ? product.screenshots[0] : product.image}')"
-                     id="modalMainImage"></div>
-                <div class="modal-thumbnails">
-                    ${thumbnailsHTML}
-                </div>
+    // Create modal content
+    modalContent.innerHTML = `
+        <div class="modal-product-images">
+            <div class="modal-main-image" 
+                 style="background-image: url('${product.screenshots && product.screenshots.length > 0 ? product.screenshots[0] : product.image}')"
+                 id="modalMainImage"></div>
+            <div class="modal-thumbnails">
+                ${thumbnailsHTML}
             </div>
-            <div class="modal-product-info">
-                <h2>${product.name}</h2>
-                <div class="modal-product-price">$${product.price.toFixed(2)}</div>
-                <div class="modal-product-meta">
-                    <div><strong>SKU:</strong> ${product.sku}</div>
-                    <div><strong>In Stock:</strong> ${product.stock}</div>
-                    <div><strong>Store:</strong> ${product.store}</div>
-                    <div><strong>Category:</strong> ${product.category || 'N/A'}</div>
-                </div>
-                <p>${product.description || 'No description available.'}</p>
-                <div class="modal-product-actions">
-                    <button class="btn">Add to Cart</button>
-                    <button class="btn btn-secondary">Save for Later</button>
-                </div>
+        </div>
+        <div class="modal-product-info">
+            <h2>${product.name}</h2>
+            <div class="modal-product-price">$${product.price.toFixed(2)}</div>
+            <div class="modal-product-meta">
+                <div><strong>SKU:</strong> ${product.sku}</div>
+                <div><strong>In Stock:</strong> ${product.stock}</div>
+                <div><strong>Store:</strong> ${product.store}</div>
+                <div><strong>Category:</strong> ${product.category || 'N/A'}</div>
+                <div id="aisleInfo"><strong>Aisle Location:</strong> Loading...</div>
             </div>
-        `;
+            <p>${product.description || 'No description available.'}</p>
+            <div class="modal-product-actions">
+                <button class="btn">Add to Cart</button>
+                <button class="btn btn-secondary">Save for Later</button>
+            </div>
+        </div>
+    `;
 
-        // Show modal
-        productModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+    // Show modal
+    productModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    // Fetch aisle information
+    fetchAisleInfo(product.sku);
+}
+
+async function fetchAisleInfo(productId) {
+    try {
+        // Get the active store's location ID
+        const activeStore = document.querySelector('.store-item.active');
+        if (!activeStore) return;
+        
+        const locationId = activeStore.dataset.locationId;
+        
+        const response = await fetch('/api/product/aisle', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                productId: productId,
+                locationId: locationId
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            document.getElementById('aisleInfo').innerHTML = `<strong>Aisle Location:</strong> Not available`;
+            return;
+        }
+        
+        if (data.aisleLocations && data.aisleLocations.length > 0) {
+            const aisle = data.aisleLocations[0];
+            const aisleText = `Aisle ${aisle.number || 'N/A'}, ${aisle.side || ''} side, Bay ${aisle.bayNumber || 'N/A'}, Shelf ${aisle.shelfNumber || 'N/A'}`;
+            document.getElementById('aisleInfo').innerHTML = `<strong>Aisle Location:</strong> ${aisleText}`;
+        } else {
+            document.getElementById('aisleInfo').innerHTML = `<strong>Aisle Location:</strong> Not available`;
+        }
+    } catch (error) {
+        console.error('Error fetching aisle info:', error);
+        document.getElementById('aisleInfo').innerHTML = `<strong>Aisle Location:</strong> Error loading`;
     }
-
+} 
     function changeModalImage(imgSrc, thumbnail) {
         // Update main image
         document.getElementById('modalMainImage').style.backgroundImage = `url('${imgSrc}')`;

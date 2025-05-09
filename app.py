@@ -106,6 +106,20 @@ def productSearchRequest():
     }
     return render_template('searchResults.html', **params)
 
+@app.route('/api/product/aisle', methods=['POST'])
+def get_product_aisle():
+    data = request.json
+    product_id = data.get('productId')
+    location_id = data.get('locationId')
+
+    kroger = oath()
+    aisle_info = kroger.get_aisle_info_by_id(product_id, location_id)
+
+    if not aisle_info:
+        return jsonify({"error": "Aisle information not found"}), 404
+
+    return jsonify(aisle_info)
+
 # Gmail functionality (keep until v2 release)
 @app.route('/v1/gmailRequest', methods=['POST'])
 def gmailRequests():
